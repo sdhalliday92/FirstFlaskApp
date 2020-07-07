@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask import render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
+from forms import PostsForm
 
 # ip address 82.16.221.36
 # 211c8c0e484b5eec9d582727aefbf64e
@@ -28,7 +29,7 @@ class Posts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     f_name = db.Column(db.String(30), nullable=False)
     l_name = db.Column(db.String(30), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(10), nullable=False)
     content = db.Column(db.String(300), nullable=False, unique=True)
 
     def __repr__(self):
@@ -53,11 +54,28 @@ def about():
     return render_template('about.html', title='About')
 
 
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    form = PostsForm()
+    if form.validate_on_submit():
+        post_data = Posts(
+            f_name=form.f_name.data,
+            l_name=form.l_name.data,
+            title=form.title.data,
+            content=form.content.data
+        )
+        db.session.add(post_data)
+        db.session.commit()
+        return redirect(url_for('home'))
+    else:
+        return render_template('post.html', title='Add a post', form=form)
+
+
 @app.route('/create')
 def create():
     db.create_all()
-    post = Posts(f_name='Hulk', l_name='Hogan', title='Mr', content='Some content')
-    post2 = Posts(f_name='Steve', l_name='Austin', title='Mr', content='Some more content')
+    post = Posts(f_name='Dwayne', l_name='Johnson', title='Mr', content='The Rock')
+    post2 = Posts(f_name='Steve', l_name='Austin', title='Mr', content='Stone Cold')
     db.session.add(post)
     db.session.add(post2)
     db.session.commit()
@@ -66,7 +84,7 @@ def create():
 
 @app.route('/delete')
 def delete():
-    #db.drop_all()
+    # db.drop_all()
     db.session.query(Posts).delete()
     db.session.commit()
     return "Everything is gone"
