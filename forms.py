@@ -30,6 +30,18 @@ def validate_email(email):
 
 
 class RegistrationForm(FlaskForm):
+    f_name = StringField('First name',
+                         validators=[
+                             DataRequired(),
+                             Length(min=1, max=30)
+                         ]
+                         )
+    l_name = StringField('Last name',
+                         validators=[
+                             DataRequired(),
+                             Length(min=1, max=30)
+                         ]
+                         )
     email = StringField('Email',
                         validators=[
                             DataRequired(),
@@ -51,22 +63,6 @@ class RegistrationForm(FlaskForm):
 
 
 class PostsForm(FlaskForm):
-    f_name = StringField(
-        'First name',
-        validators=[
-            DataRequired(),
-            Length(min=1, max=30)
-        ]
-    )
-
-    l_name = StringField(
-        'Last name',
-        validators=[
-            DataRequired(),
-            Length(min=1, max=30)
-        ]
-    )
-
     title = StringField(
         'Title',
         validators=[
